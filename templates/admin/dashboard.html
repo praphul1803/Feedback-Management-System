@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Feedback forms</h1>
+  <a class="btn" href="{{ url_for('admin_new_form') }}">+ New form</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><b>{{ stats.forms }}</b><span>Forms</span></div>
+  <div class="stat"><b>{{ stats.active }}</b><span>Open for feedback</span></div>
+  <div class="stat"><b>{{ stats.responses }}</b><span>Responses</span></div>
+  <div class="stat"><b>{{ stats.users }}</b><span>Registered students</span></div>
+</div>
+
+{% if forms %}
+<div class="card flush">
+  <table>
+    <thead>
+      <tr><th>Form</th><th>Status</th><th class="num">Questions</th><th class="num">Responses</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for f in forms %}
+      <tr>
+        <td><a href="{{ url_for('admin_edit_form', form_id=f.id) }}"><strong>{{ f.title }}</strong></a>
+          <div class="muted small">Created {{ f.created_at[:10] }}</div></td>
+        <td>{% if f.is_active %}<span class="badge badge-ok">Open</span>{% else %}<span class="badge">Closed</span>{% endif %}</td>
+        <td class="num">{{ f.question_count }}</td>
+        <td class="num">{{ f.response_count }}</td>
+        <td class="actions">
+          <a class="btn btn-sm btn-ghost" href="{{ url_for('admin_summary', form_id=f.id) }}">Summary</a>
+          <a class="btn btn-sm btn-ghost" href="{{ url_for('admin_responses', form_id=f.id) }}">Responses</a>
+          <a class="btn btn-sm btn-ghost" href="{{ url_for('admin_edit_form', form_id=f.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('admin_delete_form', form_id=f.id) }}" class="inline"
+                data-confirm="Delete '{{ f.title }}' and all {{ f.response_count }} responses? This cannot be undone.">
+            {{ csrf_input() }}
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card center"><p>No forms yet.</p><a class="btn" href="{{ url_for('admin_new_form') }}">Create your first form</a></div>
+{% endif %}
+{% endblock %}

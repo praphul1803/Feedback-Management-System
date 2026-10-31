@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Summary{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">← Dashboard</a></p>
+<div class="page-head">
+  <div>
+    <h1>{{ form.title }}: summary</h1>
+    <p class="muted">
+      {{ summary.total }} response{{ '' if summary.total == 1 else 's' }}
+      {% if summary.eligible %}from {{ summary.eligible }} registered student{{ '' if summary.eligible == 1 else 's' }}
+        ({{ (100 * summary.total / summary.eligible)|round|int }}% participation){% endif %}
+    </p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="{{ url_for('admin_responses', form_id=form.id) }}">All responses</a>
+    {% if summary.total %}<a class="btn" href="{{ url_for('admin_export', form_id=form.id) }}">Download CSV</a>{% endif %}
+  </div>
+</div>
+
+{% if not summary.results %}
+  <div class="card center"><p class="muted">This form has no questions yet.</p></div>
+{% elif summary.total == 0 %}
+  <div class="card center"><p class="muted">No responses yet. Results will appear here once students submit feedback.</p></div>
+{% else %}
+  {% for item in summary.results %}
+  <section class="card">
+    <h2>{{ loop.index }}. {{ item.question.text }}</h2>
+    <p class="muted small">{{ item.answered }} of {{ item.total }} answered · {{ QTYPES[item.question.qtype] }}</p>
+
+    {% if item.question.qtype == 'rating' %}
+      {% if item.average is not none %}
+        <p class="avg"><b>{{ '%.1f'|format(item.average) }}</b> <span class="muted">average out of 5</span></p>
+      {% endif %}
+    {% endif %}
+
+    {% if item.question.qtype != 'text' %}
+      <div class="bars">
+        {% for b in item.bars %}
+        <div class="bar-row">
+          <span class="bar-label">{{ b.label }}</span>
+          <span class="bar-track"><span class="bar-fill" style="width: {{ b.pct }}%"></span></span>
+          <span class="bar-count">{{ b.count }} <span class="muted">({{ b.pct }}%)</span></span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% if item.texts %}
+        <ul class="comments">{% for t in item.texts %}<li>{{ t }}</li>{% endfor %}</ul>
+      {% else %}
+        <p class="muted">No written answers.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+  {% endfor %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Feedback forms{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Give your feedback</h1></div>
+{% if forms %}
+  <div class="grid">
+  {% for f in forms %}
+    <article class="card form-card">
+      <h2>{{ f.title }}</h2>
+      <p class="muted">{{ f.description or 'No description.' }}</p>
+      <div class="foot-row">
+        <span class="muted small">{{ f.question_count }} question{{ '' if f.question_count == 1 else 's' }}</span>
+        {% if f.submitted %}
+          <span class="badge badge-ok">Submitted ✓</span>
+        {% else %}
+          <a class="btn btn-sm" href="{{ url_for('fill_form', form_id=f.id) }}">Give feedback</a>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+  </div>
+{% else %}
+  <div class="card center"><p class="muted">There are no open feedback forms right now. Check back later.</p></div>
+{% endif %}
+{% endblock %}

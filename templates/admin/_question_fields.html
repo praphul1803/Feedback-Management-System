@@ -1,0 +1,22 @@
+{# Shared by "add question" and "edit question". Expects q = {text, qtype, is_required, options_text} #}
+<label>Question
+  <input type="text" name="text" value="{{ q.text }}" maxlength="300" required>
+</label>
+<div class="row">
+  <label>Answer type
+    <select name="qtype" data-qtype>
+      {% for key, label in QTYPES.items() %}
+        <option value="{{ key }}" {% if q.qtype == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="check">
+    <input type="checkbox" name="is_required" value="1" {% if q.is_required %}checked{% endif %}>
+    Required
+  </label>
+</div>
+<div data-options>
+  <label>Options <span class="hint">(one per line, at least two)</span>
+    <textarea name="options" rows="4">{{ q.options_text }}</textarea>
+  </label>
+</div>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}New form{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">← Dashboard</a></p>
+<section class="card narrow-wide">
+  <h1>New feedback form</h1>
+  <form method="post" novalidate>
+    {{ csrf_input() }}
+    <label>Title
+      <input type="text" name="title" value="{{ form.title }}" maxlength="120" required autofocus>
+    </label>
+    <label>Description <span class="hint">(optional, shown to students)</span>
+      <textarea name="description" rows="3" maxlength="1000">{{ form.description }}</textarea>
+    </label>
+    <button class="btn">Create and add questions</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Edit form{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">← Dashboard</a></p>
+
+<div class="page-head">
+  <h1>{{ form.title }}</h1>
+  <div class="actions">
+    <a class="btn btn-ghost" href="{{ url_for('admin_summary', form_id=form.id) }}">Summary</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_responses', form_id=form.id) }}">Responses ({{ response_count }})</a>
+  </div>
+</div>
+
+<section class="card">
+  <h2>Form details</h2>
+  <form method="post" action="{{ url_for('admin_edit_form', form_id=form.id) }}" novalidate>
+    {{ csrf_input() }}
+    <label>Title
+      <input type="text" name="title" value="{{ form.title }}" maxlength="120" required>
+    </label>
+    <label>Description
+      <textarea name="description" rows="3" maxlength="1000">{{ form.description }}</textarea>
+    </label>
+    <label class="check">
+      <input type="checkbox" name="is_active" value="1" {% if form.is_active %}checked{% endif %}>
+      Open for feedback <span class="hint">(untick to close the form)</span>
+    </label>
+    <button class="btn">Save details</button>
+  </form>
+</section>
+
+<section class="card" id="questions">
+  <h2>Questions <span class="muted small">({{ questions|length }})</span></h2>
+  {% if response_count %}
+    <p class="notice">This form already has {{ response_count }} response{{ '' if response_count == 1 else 's' }}.
+      Deleting a question also deletes the answers given to it.</p>
+  {% endif %}
+  {% if questions %}
+  <ol class="qlist">
+    {% for item in questions %}
+    <li>
+      <div class="qmain">
+        <strong>{{ item.text }}</strong>
+        <div class="meta">
+          <span class="badge">{{ QTYPES[item.qtype] }}</span>
+          {% if item.is_required %}<span class="badge badge-warn">Required</span>{% else %}<span class="badge">Optional</span>{% endif %}
+          {% for o in item.options %}<span class="chip">{{ o }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="actions">
+        <form method="post" action="{{ url_for('admin_move_question', question_id=item.id) }}" class="inline">
+          {{ csrf_input() }}<input type="hidden" name="direction" value="up">
+          <button class="btn btn-sm btn-ghost" title="Move up" {% if loop.first %}disabled{% endif %}>↑</button>
+        </form>
+        <form method="post" action="{{ url_for('admin_move_question', question_id=item.id) }}" class="inline">
+          {{ csrf_input() }}<input type="hidden" name="direction" value="down">
+          <button class="btn btn-sm btn-ghost" title="Move down" {% if loop.last %}disabled{% endif %}>↓</button>
+        </form>
+        <a class="btn btn-sm btn-ghost" href="{{ url_for('admin_edit_question', question_id=item.id) }}">Edit</a>
+        <form method="post" action="{{ url_for('admin_delete_question', question_id=item.id) }}" class="inline"
+              data-confirm="Delete this question and its answers?">
+          {{ csrf_input() }}
+          <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+    <p class="muted">No questions yet. Add the first one below. Students only see forms that have questions.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Add a question</h2>
+  <form method="post" action="{{ url_for('admin_add_question', form_id=form.id) }}" novalidate>
+    {{ csrf_input() }}
+    {% include "admin/_question_fields.html" %}
+    <button class="btn">Add question</button>
+  </form>
+</section>
+
+<section class="card danger-zone">
+  <h2>Delete this form</h2>
+  <p class="muted">Removes the form, its questions and all {{ response_count }} responses.</p>
+  <form method="post" action="{{ url_for('admin_delete_form', form_id=form.id) }}"
+        data-confirm="Delete this form and all of its responses? This cannot be undone.">
+    {{ csrf_input() }}
+    <button class="btn btn-danger">Delete form</button>
+  </form>
+</section>
+{% endblock %}

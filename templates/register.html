@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Create an account</h1>
+  <form method="post" novalidate>
+    {{ csrf_input() }}
+    <label>Full name
+      <input type="text" name="name" value="{{ name }}" maxlength="80" required autofocus>
+    </label>
+    <label>Email
+      <input type="email" name="email" value="{{ email }}" autocomplete="username" required>
+    </label>
+    <label>Password <span class="hint">(at least 6 characters)</span>
+      <input type="password" name="password" autocomplete="new-password" required>
+    </label>
+    <label>Confirm password
+      <input type="password" name="confirm" autocomplete="new-password" required>
+    </label>
+    <button class="btn btn-block">Register</button>
+  </form>
+  <p class="muted">Already registered? <a href="{{ url_for('login') }}">Log in</a>.</p>
+</section>
+{% endblock %}

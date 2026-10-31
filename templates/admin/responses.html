@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Responses{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">← Dashboard</a></p>
+<div class="page-head">
+  <div>
+    <h1>{{ form.title }}</h1>
+    <p class="muted">{{ responses|length }} response{{ '' if responses|length == 1 else 's' }}</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="{{ url_for('admin_summary', form_id=form.id) }}">Summary</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_edit_form', form_id=form.id) }}">Edit form</a>
+    {% if responses %}<a class="btn" href="{{ url_for('admin_export', form_id=form.id) }}">Download CSV</a>{% endif %}
+  </div>
+</div>
+
+{% if responses %}
+  {% for r in responses %}
+  <article class="card response">
+    <header>
+      <strong>{{ r.name }}</strong> <span class="muted">{{ r.email }}</span>
+      <span class="muted small right">{{ r.submitted_at }} UTC</span>
+    </header>
+    <dl>
+      {% for q in questions %}
+        <dt>{{ q.text }}</dt>
+        <dd>
+          {% set v = r.answer_map.get(q.id, '') %}
+          {% if v == '' %}<span class="muted">No answer</span>
+          {% elif q.qtype == 'rating' %}<span class="rating-pill">{{ v }} / 5</span>
+          {% else %}{{ v }}{% endif %}
+        </dd>
+      {% endfor %}
+    </dl>
+  </article>
+  {% endfor %}
+{% else %}
+  <div class="card center"><p class="muted">No one has submitted feedback for this form yet.</p></div>
+{% endif %}
+{% endblock %}
