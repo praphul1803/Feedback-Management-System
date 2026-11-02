@@ -17,6 +17,7 @@ A web application where an **admin** creates feedback forms and questions, **use
 - Register and log in
 - See open forms and which ones are already completed
 - Submit feedback once per form, with validation
+- Dark and light theme toggle with system preference detection and persistent preference
 
 ## Tech stack
 
